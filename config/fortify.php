@@ -144,9 +144,9 @@ return [
     */
 
     'features' => [
-        Features::registration(),
-        Features::resetPasswords(),
-        Features::emailVerification(),
+        // Features::registration(), // Disabled - Admin only access
+        // Features::resetPasswords(), // Disabled - Admin only access
+        // Features::emailVerification(), // Disabled - Admin only access
         Features::twoFactorAuthentication([
             'confirm' => true,
             'confirmPassword' => true,
