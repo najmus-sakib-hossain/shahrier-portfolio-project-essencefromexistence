@@ -22,8 +22,9 @@ interface Props {
 export default function Profile({ user }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   
-  const { data, setData, post, processing, errors, progress } = useForm({
+  const { data, setData, post, processing, errors, progress, reset } = useForm({
     name: user.name,
+    email: user.email,
     avatar: null as File | null,
   })
 
@@ -31,6 +32,10 @@ export default function Profile({ user }: Props) {
     e.preventDefault()
     post('/profile/update', {
       forceFormData: true,
+      onSuccess: () => {
+        // Reset the avatar field after successful upload
+        reset('avatar')
+      },
     })
   }
 
@@ -74,8 +79,9 @@ export default function Profile({ user }: Props) {
                     <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
                       <Avatar className="h-32 w-32">
                         <AvatarImage 
-                          src={data.avatar ? URL.createObjectURL(data.avatar) : user.avatar || undefined} 
-                          alt={user.name} 
+                          src={data.avatar ? URL.createObjectURL(data.avatar) : (user.avatar || undefined)} 
+                          alt={user.name}
+                          key={data.avatar ? 'preview' : user.avatar}
                         />
                         <AvatarFallback className="text-2xl">{getInitials(user.name)}</AvatarFallback>
                       </Avatar>
@@ -126,19 +132,19 @@ export default function Profile({ user }: Props) {
                     )}
                   </div>
 
-                  {/* Email Display (Read-only) */}
+                  {/* Email Input (Now Editable) */}
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
-                      value={user.email}
-                      disabled
-                      className="bg-muted"
+                      value={data.email}
+                      onChange={(e) => setData('email', e.target.value)}
+                      placeholder="Your email address"
                     />
-                    <p className="text-xs text-muted-foreground">
-                      Email cannot be changed
-                    </p>
+                    {errors.email && (
+                      <p className="text-sm text-destructive">{errors.email}</p>
+                    )}
                   </div>
 
                   {/* Submit Button */}
