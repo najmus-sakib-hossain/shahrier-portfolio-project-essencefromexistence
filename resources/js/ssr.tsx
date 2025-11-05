@@ -11,13 +11,15 @@ createServer((page) =>
         render: ReactDOMServer.renderToString,
         title: (title) => (title ? `${title} - ${appName}` : appName),
         resolve: async (name) => {
-            // Try .tsx first, then .jsx
+            // Load all pages with both .tsx and .jsx extensions
             const pages = import.meta.glob('./pages/**/*.{tsx,jsx}');
             
+            // Try .tsx first, then .jsx
             for (const extension of ['tsx', 'jsx']) {
                 const path = `./pages/${name}.${extension}`;
                 if (pages[path]) {
-                    return pages[path]();
+                    const module = await pages[path]();
+                    return module;
                 }
             }
             
